@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bslkqxfd02wy0"]
+
+[ext_resource type="Script" uid="uid://blocn4vbc8va6" path="res://Scripts/enemy(base).gd" id="1_s6281"]
+
+[node name="Enemy(base)" type="Node2D"]
+script = ExtResource("1_s6281")
+
+[node name="EnemyTimer" type="Timer" parent="."]
+
+[connection signal="timeout" from="EnemyTimer" to="." method="_on_enemy_timer_timeout"]
