@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=2 format=3 uid="uid://dj882a25nq2th"]
+
+[ext_resource type="Script" uid="uid://cmf0kccq7uyu6" path="res://Scripts/EnemyResource.gd" id="1_dfxq4"]
+
+[resource]
+script = ExtResource("1_dfxq4")
+min_wait_time = 2.0
+max_wait_time = 7.0
+metadata/_custom_type_script = "uid://cmf0kccq7uyu6"

@@ -3,13 +3,13 @@ extends Node
 enum GameState {
     STATE_MENU,
     STATE_PLAYING,
-    STATE_PAUSED,
+    STATE_POWERUP,
     STATE_GAME_OVER
 }
 
 @export var current_state: GameState = GameState.STATE_MENU
 @export var main_menu: PackedScene
-@export var playground_scene: PackedScene
+@export var all_levels : Array[PackedScene]
 
 func _ready() -> void:
     current_state = GameState.STATE_MENU
@@ -30,9 +30,21 @@ func update_scene():
                 if menu_instance.has_signal("request_playing_state"):
                     menu_instance.connect("request_playing_state", Callable(self, "_on_request_playing_state"))
         GameState.STATE_PLAYING:
-            if playground_scene:
-                var playground_instance = playground_scene.instantiate()
+            if all_levels:
+                var playground_instance = all_levels[0].instantiate()
                 add_child(playground_instance)
+                # Connect to playground state_changed signal
+                if playground_instance.has_signal("state_changed"):
+                    playground_instance.connect("state_changed", Callable(self, "_on_playground_state_changed"))
+
+# Handler for playground state changes
+func _on_playground_state_changed(new_state):
+    # Add your logic here for each state
+    match new_state:
+        0: # PlaygroundState.STATE_BEFORE
+            print("GameManager: Playground state is BEFORE")
+        1: # PlaygroundState.STATE_ACTIVE
+            print("GameManager: Playground state is ACTIVE")
 
 # Handler for main menu signal
 func _on_request_playing_state():

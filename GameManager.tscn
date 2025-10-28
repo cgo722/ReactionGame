@@ -7,4 +7,4 @@
 [node name="Node" type="Node"]
 script = ExtResource("1_p13vs")
 main_menu = ExtResource("2_aelf4")
-playground_scene = ExtResource("3_au0an")
+all_levels = Array[PackedScene]([ExtResource("3_au0an")])

@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://bslkqxfd02wy0"]
+[gd_scene load_steps=3 format=3 uid="uid://bslkqxfd02wy0"]
 
 [ext_resource type="Script" uid="uid://blocn4vbc8va6" path="res://Scripts/enemy(base).gd" id="1_s6281"]
+[ext_resource type="Resource" uid="uid://dj882a25nq2th" path="res://Resource/Enemy Resources/Beginner Joe.tres" id="2_ut8sf"]
 
 [node name="Enemy(base)" type="Node2D"]
 script = ExtResource("1_s6281")
+enemy_resource = Array[Resource]([ExtResource("2_ut8sf")])
 
 [node name="EnemyTimer" type="Timer" parent="."]
 
