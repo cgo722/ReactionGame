@@ -24,19 +24,18 @@ func _ready():
         player.connect("screen_touched", Callable(self, "_on_player_screen_touched"))
 
 # Helper to set state and emit signal
-func set_state(new_state):
+func set_state(new_state, emit: bool = true):
     state = new_state
-    emit_signal("state_changed", state)
+    if emit:
+        emit_signal("state_changed", state)
 
 func _on_player_screen_touched():
     if state == PlaygroundState.STATE_LOSE:
-        print("Lose")
         set_state(PlaygroundState.STATE_LOSE)
     elif state == PlaygroundState.STATE_WIN:
-        print("Win")
         set_state(PlaygroundState.STATE_WIN)
 
 func _on_timer_timeout() -> void:
-    # Set state to active when timer times out
-    set_state(PlaygroundState.STATE_WIN)
+    # Set state to win, but do NOT emit signal
+    set_state(PlaygroundState.STATE_WIN, false)
     get_node(go).visible = true

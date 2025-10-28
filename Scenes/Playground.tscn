@@ -16,7 +16,7 @@ go = NodePath("UI/Gosign")
 [node name="Scene Timer" type="Timer" parent="."]
 one_shot = true
 
-[node name="Enemy(base)" parent="." node_paths=PackedStringArray("playground", "enemy_timer", "scene_timer") instance=ExtResource("3_eqbnc")]
+[node name="Enemy(base)" parent="." node_paths=PackedStringArray("playground") instance=ExtResource("3_eqbnc")]
 playground = NodePath("..")
 enemy_timer = NodePath("EnemyTimer")
 scene_timer = NodePath("../Scene Timer")

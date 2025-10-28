@@ -36,4 +36,12 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Play"
 
+[node name="Button2" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(417.31, 94.96)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Support the Dev"
+
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/Button2" to="." method="_on_button_2_pressed"]
