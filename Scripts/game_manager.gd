@@ -15,8 +15,22 @@ enum GameState {
 var current_round = 0
 
 func _ready() -> void:
+    EventBus.start_game.connect(_on_event_bus_start_game)
+    EventBus.round_won.connect(_on_event_bus_round_won)
+    EventBus.round_lost.connect(_on_event_bus_round_lost)
+    EventBus.retry.connect(_on_event_bus_retry)
+    EventBus.return_to_menu.connect(_on_event_bus_return_to_menu)
+
     current_state = GameState.STATE_MENU
     update_scene()
+
+func _exit_tree():
+    EventBus.start_game.disconnect(_on_event_bus_start_game)
+    EventBus.round_won.disconnect(_on_event_bus_round_won)
+    EventBus.round_lost.disconnect(_on_event_bus_round_lost)
+    EventBus.retry.disconnect(_on_event_bus_retry)
+    EventBus.return_to_menu.disconnect(_on_event_bus_return_to_menu)
+
 func update_scene():
     for child in get_children():
         remove_child(child)
@@ -28,63 +42,43 @@ func update_scene():
             if main_menu:
                 var menu_instance = main_menu.instantiate()
                 add_child(menu_instance)
-                # Connect the signal from main menu
-                if menu_instance.has_signal("request_playing_state"):
-                    menu_instance.connect("request_playing_state", Callable(self, "_on_request_playing_state"))
         GameState.STATE_PLAYING:
             if playground_scene and enemy_resources:
                 var playground_instance = playground_scene.instantiate()
-                playground_instance.enemy_resource = enemy_resources[current_round]
+                var enemy_index = current_round % enemy_resources.size()
+                if current_round > 0 and enemy_index == 0: # A full cycle is complete
+                    for resource in enemy_resources:
+                        resource.min_wait_time /= 2
+                        resource.max_wait_time /= 2
+                playground_instance.enemy_resource = enemy_resources[enemy_index]
                 playground_instance.current_round = current_round
                 add_child(playground_instance)
-                # Connect to playground state_changed signal
-                if playground_instance.has_signal("state_changed"):
-                    playground_instance.connect("state_changed", Callable(self, "_on_playground_state_changed"))
         GameState.STATE_GAME_OVER:
-            # Overlay game over screen, keep playground
             var game_over_instance = game_over_scene.instantiate()
             add_child(game_over_instance)
-            # Connect signals from game over screen
-            if game_over_instance.has_signal("request_main_menu"):
-                game_over_instance.connect("request_main_menu", Callable(self, "_on_request_main_menu"))
-            if game_over_instance.has_signal("request_retry"):
-                game_over_instance.connect("request_retry", Callable(self, "_on_request_retry"))
         GameState.STATE_POWERUP:
-            # Handle power-up state (not implemented here)
             pass
-# Handler for ad continue signal
 
-# Handler for game over screen main menu signal
-func _on_request_main_menu():
-    current_state = GameState.STATE_MENU
-    update_scene()
-
-# Handler for game over screen retry signal
-func _on_request_retry():
-    current_state = GameState.STATE_PLAYING
-    update_scene()
-
-# Handler for playground state changes
-func _on_playground_state_changed(new_state):
-    # Only process if still playing
-    match new_state:
-        0: # PlaygroundState.STATE_Win
-            print("GameManager: Win")
-            current_round += 1
-            if current_round < enemy_resources.size():
-                current_state = GameState.STATE_PLAYING
-                update_scene()
-            else:
-                current_state = GameState.STATE_MENU
-                update_scene()
-        1: # PlaygroundState.STATE_LOSE
-            print("GameManager: Lose")
-            current_state = GameState.STATE_GAME_OVER
-            update_scene()
-
-# Handler for main menu signal
-func _on_request_playing_state():
+func _on_event_bus_start_game():
     current_round = 0
     current_state = GameState.STATE_PLAYING
     update_scene()
 
+func _on_event_bus_round_won():
+    print("GameManager: Win")
+    current_round += 1
+    current_state = GameState.STATE_PLAYING
+    update_scene()
+
+func _on_event_bus_round_lost():
+    print("GameManager: Lose")
+    current_state = GameState.STATE_GAME_OVER
+    update_scene()
+
+func _on_event_bus_retry():
+    current_state = GameState.STATE_PLAYING
+    update_scene()
+
+func _on_event_bus_return_to_menu():
+    current_state = GameState.STATE_MENU
+    update_scene()

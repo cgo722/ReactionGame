@@ -1,14 +1,12 @@
 extends Node2D
 
-# Signal to notify GameManager of state changes
-signal state_changed(new_state)
-
 enum PlaygroundState {
 	STATE_WIN,
 	STATE_LOSE
 }
-	# Holds the current state of the playground
+
 var state
+
 @export var timer: Timer
 @export var timer_duration_min: float = 1.0
 @export var timer_duration_max: float = 5.0
@@ -21,25 +19,20 @@ var current_round: int
 
 # Parry / combat configuration
 @export var parry_timer: Timer
-@export var parry_window_time: float = 0.5
 
 # Runtime state
 var current_attacker: String = "" # "player" or "enemy"
 var parry_active: bool = false
-var current_parry_window_time: float
 
 func _ready():
 	if round_label:
 		round_label.text = "Round: " + str(current_round + 1)
 	timer.wait_time = randf_range(timer_duration_min, timer_duration_max)
 	timer.start()
-	# Use get_node for player NodePath
-	if player and has_node(player):
-		get_node(player).connect("screen_touched", Callable(self, "_on_player_screen_touched"))
+
+	EventBus.player_input.connect(_on_event_bus_player_input)
+
 	if parry_timer:
-		current_parry_window_time = parry_window_time
-		parry_timer.wait_time = current_parry_window_time
-		# Only connect if not already connected (prevents duplicate connection error)
 		if not parry_timer.is_connected("timeout", Callable(self, "_on_parry_timer_timeout")):
 			parry_timer.connect("timeout", Callable(self, "_on_parry_timer_timeout"))
 
@@ -49,13 +42,19 @@ func _ready():
 		if enemy_timer:
 			enemy_timer.wait_time = randf_range(enemy_resource.min_wait_time, enemy_resource.max_wait_time)
 
+func _exit_tree():
+	EventBus.player_input.disconnect(_on_event_bus_player_input)
+
 # Helper to set state and emit signal
 func set_state(new_state, emit: bool = true):
 	state = new_state
 	if emit:
-		emit_signal("state_changed", state)
+		if new_state == PlaygroundState.STATE_WIN:
+			EventBus.emit_signal("round_won")
+		elif new_state == PlaygroundState.STATE_LOSE:
+			EventBus.emit_signal("round_lost")
 
-func _on_player_screen_touched():
+func _on_event_bus_player_input():
 	if go and has_node(go) and get_node(go).visible:
 		player_attack()
 	else:
@@ -96,16 +95,12 @@ func parry_success(by_who: String) -> void:
 func start_parry_window() -> void:
 	parry_active = true
 	if parry_timer:
-		parry_timer.wait_time = parry_window_time
 		parry_timer.start()
 	# Optionally show attack indicator
 	if go and has_node(go):
 		get_node(go).visible = true
 
 func _on_timer_timeout() -> void:
-	# Instead of just setting state, start the first enemy attack (if not already in parry)
-	#if not parry_active:
-	#    enemy_attack()
 	if go and has_node(go):
 		get_node(go).visible = true
 
