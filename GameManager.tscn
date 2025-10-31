@@ -1,12 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://ch3ca50lfv4rq"]
+[gd_scene load_steps=7 format=3 uid="uid://ch3ca50lfv4rq"]
 
 [ext_resource type="Script" uid="uid://bbc8fydqumct4" path="res://Scripts/game_manager.gd" id="1_p13vs"]
 [ext_resource type="PackedScene" uid="uid://h8q6ks1xtn78" path="res://Scenes/UI/Main Menu.tscn" id="2_aelf4"]
 [ext_resource type="PackedScene" uid="uid://cx0ifn3q6ewg7" path="res://Scenes/UI/GameOverScreen.tscn" id="3_108xg"]
 [ext_resource type="PackedScene" uid="uid://vyubgxyp817j" path="res://Scenes/Playground.tscn" id="3_au0an"]
+[ext_resource type="Resource" uid="uid://dj882a25nq2th" path="res://Resource/Enemy Resources/Beginner Joe.tres" id="4_abcde"]
+[ext_resource type="Resource" uid="uid://dix882a25nq2th" path="res://Resource/Enemy Resources/Intermediate Ivan.tres" id="5_fghij"]
+[ext_resource type="Resource" uid="uid://dix882a25nq2ti" path="res://Resource/Enemy Resources/Advanced Amy.tres" id="6_klmno"]
 
 [node name="Node" type="Node"]
 script = ExtResource("1_p13vs")
 main_menu = ExtResource("2_aelf4")
 game_over_scene = ExtResource("3_108xg")
-all_levels = Array[PackedScene]([ExtResource("3_au0an")])
+playground_scene = ExtResource("3_au0an")
+enemy_resources = [ExtResource("4_abcde"), ExtResource("5_fghij"), ExtResource("6_klmno")]

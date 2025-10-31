@@ -10,7 +10,9 @@ enum GameState {
 @export var current_state: GameState = GameState.STATE_MENU
 @export var main_menu: PackedScene
 @export var game_over_scene: PackedScene
-@export var all_levels : Array[PackedScene]
+@export var playground_scene: PackedScene
+@export var enemy_resources : Array[Resource]
+var current_round = 0
 
 func _ready() -> void:
     current_state = GameState.STATE_MENU
@@ -30,8 +32,10 @@ func update_scene():
                 if menu_instance.has_signal("request_playing_state"):
                     menu_instance.connect("request_playing_state", Callable(self, "_on_request_playing_state"))
         GameState.STATE_PLAYING:
-            if all_levels:
-                var playground_instance = all_levels[0].instantiate()
+            if playground_scene and enemy_resources:
+                var playground_instance = playground_scene.instantiate()
+                playground_instance.enemy_resource = enemy_resources[current_round]
+                playground_instance.current_round = current_round
                 add_child(playground_instance)
                 # Connect to playground state_changed signal
                 if playground_instance.has_signal("state_changed"):
@@ -66,8 +70,13 @@ func _on_playground_state_changed(new_state):
     match new_state:
         0: # PlaygroundState.STATE_Win
             print("GameManager: Win")
-            current_state = GameState.STATE_POWERUP
-            update_scene()
+            current_round += 1
+            if current_round < enemy_resources.size():
+                current_state = GameState.STATE_PLAYING
+                update_scene()
+            else:
+                current_state = GameState.STATE_MENU
+                update_scene()
         1: # PlaygroundState.STATE_LOSE
             print("GameManager: Lose")
             current_state = GameState.STATE_GAME_OVER
@@ -75,6 +84,7 @@ func _on_playground_state_changed(new_state):
 
 # Handler for main menu signal
 func _on_request_playing_state():
+    current_round = 0
     current_state = GameState.STATE_PLAYING
     update_scene()
 
